@@ -35,22 +35,6 @@ before using this.**
 ![resource-manager-use-case](images/resource-manager-use-case.png)
 
 
-----
-# OCI Function Service 
-
-## Build and Deploy the Function
-
-Please see the instruction here for an [Overview of OCI Function](https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm).
-
-Note that you need to deploy your Fn Application in the tenancy's home region if you expect to manipulate IAM
-constructs (create compartments for example)
-
-----
-## How the Function Works
-
-The function itself is quite small and straightforward because the OCI command line interface is implemented in Python!
-All it does is call a subprocess to execute the CLI command you give it.
-
 ---
 # Tenancy Configuration
 
@@ -139,26 +123,43 @@ over in the `cli-target` tenancy.
     endorse dynamic-group cli-control-plane-dg to use functions-family IN compartment id ocid1.compartment.oc1...
 
 ----
-# Using the Function
+# The Function
 
-You should now be able to ssh into the VM in the `cli-control-plane` tenancy and execute the CLI examples below.
-You can also call the CLI proxy from a local developer machine.  _Just be aware that local developer machine 
-calls wil not exercise the cross-tenancy policy configuration._
+The function itself is quite small and straightforward because the OCI command line interface is implemented in Python.
+All it does is call a subprocess to execute the CLI command you give it.
+
+The `Dockerfile` overrides the default behavior to resolve an oci-cli package path issue.
+
+## Build and Deploy the Function
+
+Build and deploy the function in the `cli-target `tenancy.   Note that you need to deploy this function 
+in the tenancy's home region if you need to manipulate IAM
+constructs (create compartments for example)
+
+Please see the instruction here for an [Overview of OCI Function](https://docs.oracle.com/en-us/iaas/Content/Functions/Concepts/functionsoverview.htm).
 
 ## Two Ways to Invoke the Function
 
 A function can be invoked using the `oci` command line itself or the `fn` command line.  The oci command line
 method is more robust as it will work across tenancies or regions and does not require a compartment id, etc.
 
+## Invoking the Function from Control Plane VM
 
-## Use OCID Exports
+You should now be able to ssh into the VM in the `cli-control-plane` tenancy and execute the CLI examples below.
 
-Export target tenancy OCIDs for convenience as you go:
+## Invoking the Function from Developer Machine
+
+You can also call the CLI proxy from a local developer machine.  _Just be aware that local developer machine 
+calls wil not exercise the cross-tenancy policy configuration._
+
+----
+# Example Invocations
+
+The below examples assume you will export OCIDs as you go:
 
     export TENANCY_ID=ocid1.tenancy.oc1.phx...
     export COMP_ID=ocid1.compartment.oc1.phx...
     export FN_ID=ocid1.fnfunc.oc1.phx...
-
 
 ## Object Storage Namespace
 
@@ -184,9 +185,9 @@ Export target tenancy OCIDs for convenience as you go:
 
 ----
 
-# Infrastructure as Code / Terraform using OCI Resource Manager
+# OCI Resource Manager
 
-Let's use the Function to proxy calls over to the `cli-remote` tenancy's Resource Manager to run some terraform.  
+Let's use the Function to proxy calls over to the `cli-target` tenancy's Resource Manager to run some Terraform.  
 
 ## List Architecture Types (Category 2)
 
